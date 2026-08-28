@@ -1,0 +1,95 @@
+!pip install -q groq
+
+import os 
+import getpass
+
+os.environ["GROQ_API_KEY"] = getpass.getpass("enter your groq api key: ")
+
+from groq import Groq
+
+client = Groq(api_key = os.environ["GROQ_API_KEY"])
+print(client)
+
+for i in client.models.list():
+  print(i)
+
+
+
+roles = {
+    "genai mentor" : """
+    You are an experienced Senior GenAI Professor with 10 years+ mentoring experience to the college students.
+    Your Job:
+    - Teach Generative AI concepts very easily with real life example.
+    - Explain topics always like a beginner.
+    - Use Analogies, examples, real life usage in industry and coding implementation with Python only.
+    - Always clear the doubts of the students.
+    - Dont create the answer by yourself check the fact always.
+    """,
+
+    "agentic ai mentor" : """
+    You are an experienced Senior Agentic AI Professor with 10 years+ mentoring experience to the college students.
+    Your Job:
+    - Teach Agentic AI concepts very easily with real life example.
+    - Explain topics always like a beginner.
+    - Use Analogies, examples, real life usage in industry and coding implementation with Python only.
+    - Always clear the doubts of the students.
+    - Dont create the answer by yourself check the fact always.
+    """,
+
+    "career mentor":"""
+      You are an experienced tech career mentor and AI Professor with 10 years+ mentoring experience to the college students.
+    Your Job:
+    - Recommened important certification and skills as per current market trends 2026 august month.
+    - Suggest and improve the coding standards of the coder.
+    """
+}
+
+
+
+selected_roles = input("Enter your AI personal assistant role")
+print("you chose : ",selected_roles)
+
+messages = [{ "role": selected_roles, "content":roles[selected_roles]}]
+
+
+
+def chat(user_input):
+
+    messages.append({"role":"user", "content": user_input}) #store user chat history
+
+    response = client.chat.completions.create(
+    model = 'qwen/qwen3.8-27b', #meta-llama/llama-prompt-guard-2-86m , openai/gpt-oss-20b, qwen/qwen3.8-27b
+    max_tokens = 1024,
+    messages = [{"role":"user","content":user_input}]
+    )
+    ai_response = response.choices[0].message.content
+
+    messages.append({"role":"ai assistant", "content": ai_response}) #store ai response history
+
+    return ai_response
+
+
+
+available_role_names = list(roles.keys())
+for i in available_role_names:
+  print(i)
+
+
+
+
+while True:
+  user_input = input("\n You : ")
+
+  if user_input == 'exit' or user_input == 'EXIT' or user_input == 'bye' or user_input == 'BYE':
+    print("Chat closed...")
+    break
+
+  answer = chat(user_input)
+  print("\n AI: ", answer)
+
+print(messages) #this will show entire chat history
+
+
+
+for i in messages:
+  print(i)
