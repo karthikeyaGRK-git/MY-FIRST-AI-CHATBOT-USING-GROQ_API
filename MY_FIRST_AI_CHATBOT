@@ -1,0 +1,25 @@
+!pip install -q groq
+
+import os
+import getpass
+
+os.environ["GROQ_API_KEY"] = getpass.getpass("Enter your Groq API Key: ") 
+
+from groq import Groq
+
+client = Groq(api_key = os.environ["GROQ_API_KEY"])
+print(client) #client through which we will communicate with groq servers
+
+# Python Code -> Groq Client Object through API key -> Communicate with groq servers
+
+for i in client.models.list():
+  print(i)
+
+chat = client.chat.completions.create(
+    model = 'qwen/qwen3.8-27b', #meta-llama/llama-prompt-guard-2-86m , openai/gpt-oss-20b, qwen/qwen3.8-27b
+    messages = [{
+    "role":"user",
+    "content":input("Hi, I am a AI powered chatbot. Ask me anything...")
+    }]
+)
+print(chat.choices[0].message.content)
